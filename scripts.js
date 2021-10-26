@@ -27,6 +27,8 @@ const filterAction = (value) => {
   value === "+/-" ? setOperation("+/-") : null;
 
   value === "=" ? calculation("=") : null;
+
+  value === "AC" ? resetCalculator() : null;
 };
 
 function addNumberInput(value) {
@@ -35,9 +37,15 @@ function addNumberInput(value) {
 
   if (inputValue === "0" && inputValue.length === 1 && value !== ",") {
     inputScreen.value = value;
-  } else {
-    inputScreen.value += value;
+    return;
   }
+
+  if (inputScreen.value === "" && value === ",") {
+    inputScreen.value = 0 + value;
+    return;
+  }
+
+  inputScreen.value = inputValue + value;
 }
 
 function setOperation(operator) {
@@ -56,8 +64,42 @@ function calculation() {
   let valueTwo = transformCommaToPoint(inputScreen.value);
   let total = 0;
 
-  if (this.operator === "+" && inputScreen !== "") {
+  if (this.operator === "+" && inputScreen.value !== "") {
     total = valueOne + valueTwo;
+  }
+
+  if (this.operator === "-" && inputScreen.value !== "") {
+    if (valueOne !== 0) {
+      total = valueOne - valueTwo;
+    } else {
+      total = valueTwo;
+    }
+  }
+
+  if (this.operator === "*" && inputScreen.value !== "") {
+    if (valueOne !== 0) {
+      total = valueOne * valueTwo;
+    } else {
+      total = valueTwo;
+    }
+  }
+
+  if (this.operator === "/" && inputScreen.value !== "") {
+    if (valueOne !== 0) {
+      total = valueOne / valueTwo;
+    } else {
+      total = valueTwo;
+    }
+  }
+
+  if (this.operator === "%" && inputScreen.value !== "") {
+    total = valueTwo / 100;
+  }
+
+  if (this.operator === "+/-" && inputScreen.value !== "") {
+    if (valueTwo > 0) {
+      total = -valueTwo;
+    }
   }
 
   total = transformPointToComma(total);
@@ -79,3 +121,10 @@ function transformPointToComma(value) {
   resultTransform = resultTransform.replace(".", ",");
   return resultTransform;
 }
+
+const resetCalculator = () => {
+  const inputScreen = document.getElementsByClassName("calculator__screen")[0];
+  inputScreen.value = 0;
+  this.inputValueMemo = 0;
+  this.operator = null;
+};
